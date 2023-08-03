@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+UNAMEOUT="$(uname -s)"
+
+# Verify operating system is supported
+case "${UNAMEOUT}" in
+    Linux*)             MACHINE=linux;;
+    Darwin*)            MACHINE=mac;;
+    *)                  MACHINE="UNKNOWN"
+esac
+
+if [ "$MACHINE" == "UNKNOWN" ]; then
+    echo "Unsupported operating system. Genie supports macOS, Linux, and Windows (WSL2)." >&2
+    exit 1
+fi
+
+# Check if Git is installed
+git version &> /dev/null
+if [ $? -ne 0 ]; then
+    echo "Missing required dependency. Genie needs Git in order to be installed and updated." >&2
+    exit 1
+fi
+
+# Clone and install Genie
+DOWNLOAD_PATH="/tmp/genie"
+INSTALL_PATH="/usr/local/bin/genie"
+
+git clone --quiet ssh://git@git.zitec.ro:6246/research/genie.git "$DOWNLOAD_PATH"
+sudo cp "$DOWNLOAD_PATH/genie" "$INSTALL_PATH"
+sudo chmod 0755 "$INSTALL_PATH"
+rm -rf "$DOWNLOAD_PATH"
+
+echo "Success!" >&2
