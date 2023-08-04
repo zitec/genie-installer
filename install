@@ -171,7 +171,7 @@ install_packages () {
   else
     out_line
     sudo npm install -g --no-progress @research/genie > /dev/null
-    sudo chmod 0775 "$NPM_PREFIX/bin/genie"
+    sudo chmod 0755 "$NPM_PREFIX/bin/genie"
   fi
 
   if [ "$?" -eq 0 ]; then
