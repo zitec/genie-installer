@@ -158,7 +158,7 @@ install_packages () {
   out_step "Install Packages" "4 / 4"
   out_line
 
-  out_line "Installing globally the following Node.js packages:"
+  out_line "Installing the following Node.js packages:"
   out_line
   out_line "${GREY}- @research/genie${NC}"
 
