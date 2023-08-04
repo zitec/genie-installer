@@ -1,33 +1,187 @@
 #!/usr/bin/env bash
 
-UNAMEOUT="$(uname -s)"
+# Determine if stdout is a terminal
+if test -t 1; then
 
-# Verify operating system is supported
-case "${UNAMEOUT}" in
-    Linux*)             MACHINE=linux;;
-    Darwin*)            MACHINE=mac;;
-    *)                  MACHINE="UNKNOWN"
-esac
+    # Determine if colors are supported
+    ncolors=$(tput colors)
 
-if [ "$MACHINE" == "UNKNOWN" ]; then
-    echo "Unsupported operating system. Genie supports macOS, Linux, and Windows (WSL2)." >&2
-    exit 1
+    if test -n "$ncolors" && test "$ncolors" -ge 8; then
+        BOLD="$(tput bold)"
+        RED="$(tput setaf 1)"
+        GREEN="$(tput setaf 2)"
+        YELLOW="$(tput setaf 3)"
+        BLUE="$(tput setaf 4)"
+        PINK="$(tput setaf 5)"
+        CYAN="$(tput setaf 6)"
+        GREY="$(tput setaf 8)"
+        NC="$(tput sgr0)"
+    fi
 fi
 
-# Check if Git is installed
-git version &> /dev/null
-if [ $? -ne 0 ]; then
-    echo "Missing required dependency. Genie needs Git in order to be installed and updated." >&2
+# Function that reads user input and outputs it
+read_input () {
+  read -p "${CYAN}$1${NC} " -r
+  echo $REPLY
+}
+
+# Function that blocks script until user confirms
+confirm_continue () {
+  read -p "${CYAN}$1${NC} [Y/N]: " -n 1 -r
+  echo  # move to a new line
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 1
+  fi
+}
+
+# Function that outputs supplied string with a new line at the end
+out_line () {
+  printf "%s\n" "$1"
+}
+
+# Function that outputs supplied string in header style
+out_step () {
+  printf "${PINK}+------------------------------------------------+\n" "$1"
+  printf "| %-40s %s |\n" "$1" "$2"
+  printf "+------------------------------------------------+\n${NC}" "$1"
+}
+
+# Function that outputs supplied string in error style
+out_err () {
+  printf "${RED}Error:${NC} %s\n" "$1"
+}
+
+# Function that outputs supplied string in requirement style
+out_req () {
+  if [ "$2" = true ]; then
+    printf "${GREEN}%-30s ✓${NC}\n" "$1"
+  else
+    printf "${RED}%-30s 𐄂${NC}\n" "$1"
+  fi
+}
+
+# Function that displays the welcome message
+display_welcome () {
+
+  clear
+
+  out_step "Ginie Installer" "1 / 4"
+  out_line
+  out_line "This wizard is going to help you setup Ginie on your system."
+  out_line "It will ask for your permission before performing any local changes."
+  out_line
+
+  confirm_continue "Would you like to continue?"
+}
+
+# Function that checks for all requirements
+check_requirements() {
+
+  clear
+
+  out_step "Requirements Check" "2 / 4"
+  out_line
+  
+  out_line "Performing check..."
+  out_line
+
+  local HAS_REQUIREMENTS=true
+
+  # Check if Node is installed
+  local IS_NODE_INSTALLED=false
+  which node &> /dev/null
+  if [ "$?" -eq 0 ]; then
+
+    # Check if Node has minimum version
+    local NODE_VERSION_OUT="$(node --version)"
+    local NODE_VERSION_INSTALLED="${NODE_VERSION_OUT:1:2}"
+    local NODE_VERSION_REQUIRED=18
+
+    if [ "$NODE_VERSION_INSTALLED" -gt "$NODE_VERSION_REQUIRED" ]; then
+      IS_NODE_INSTALLED=true
+    else
+      HAS_REQUIREMENTS=false
+    fi
+
+  else
+    HAS_REQUIREMENTS=false
+  fi
+  
+  out_req "Node.js (>= v18)" "$IS_NODE_INSTALLED"
+  out_line
+
+  if [ "$HAS_REQUIREMENTS" = false ]; then
+    out_err "Some of the requirements are missing."
+    out_line
     exit 1
-fi
+  fi
 
-# Clone and install Genie
-DOWNLOAD_PATH="/tmp/genie"
-INSTALL_PATH="/usr/local/bin/genie"
+  out_line "Your system meets all the necessary requirements."
+  out_line
+  confirm_continue "Would you like to continue?"
+}
 
-git clone --quiet ssh://git@git.zitec.ro:6246/research/genie.git "$DOWNLOAD_PATH"
-sudo cp "$DOWNLOAD_PATH/genie" "$INSTALL_PATH"
-sudo chmod 0755 "$INSTALL_PATH"
-rm -rf "$DOWNLOAD_PATH"
+# Function that sets up the Gitlab token
+setup_token () {
 
-echo "Success!" >&2
+  clear
+
+  out_step "Gitlab Token" "3 / 4"
+  out_line
+
+  out_line "Generate a new token with ${CYAN}read_api${NC} scope and paste it down below."
+  out_line
+  out_line "This link will take you directly to Gitlab's Access Token page:"
+  out_line "${GREY}https://gitlab.zitec.com/-/profile/personal_access_tokens${NC}"
+  out_line
+
+  local GITLAB_TOKEN=$(read_input "Token:")
+  out_line
+
+  out_line "Updating ${CYAN}~/.npmrc${NC} with the following changes:"
+  out_line
+  out_line "${GREY}@research:registry=https://gitlab.zitec.com/api/v4/packages/npm/"
+  out_line "//gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}${NC}"
+
+  out_line
+  confirm_continue "Would you like to continue?"
+
+  npm config set -- //gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
+  npm config set @research:registry https://gitlab.zitec.com/api/v4/packages/npm/
+}
+
+# Function that installs Node.js packages
+install_packages () {
+
+  clear
+
+  out_step "Install Packages" "4 / 4"
+  out_line
+
+  out_line "Installing globally the following Node.js packages:"
+  out_line
+  out_line "${GREY}- @research/genie${NC}"
+
+  out_line
+  confirm_continue "Would you like to continue?"
+
+  npm install -g --no-progress @research/genie > /dev/null
+
+  out_line
+  out_line "${GREEN}Genie installed successfully!${NC}"
+  out_line
+}
+
+# Function that starts the script
+main () {
+
+  display_welcome
+
+  check_requirements
+
+  setup_token
+
+  install_packages
+}
+
+main
