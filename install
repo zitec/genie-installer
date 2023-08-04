@@ -166,11 +166,10 @@ install_packages () {
 
   # Check if we need to elevate privileges
   local NPM_PREFIX=$(npm config get prefix)
-  if [ -w "$NPM_PREFIX/lib/node_modules" ]; then
+  if [ -w "$NPM_PREFIX" ]; then
     npm install -g --no-progress @research/genie > /dev/null
   else
-    out_line
-    sudo npm install -g --no-progress @research/genie > /dev/null
+    sudo npm install -g --no-progress @research/genie > /dev/null && \
     sudo chmod 0755 "$NPM_PREFIX/bin/genie"
   fi
 
