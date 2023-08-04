@@ -165,12 +165,13 @@ install_packages () {
   confirm_continue "Would you like to continue?"
 
   # Check if we need to elevate privileges
-  local PKG_INSTALL_DIR=$(npm root -g)
-  if [ -w "$PKG_INSTALL_DIR" ]; then
+  local NPM_PREFIX=$(npm config get prefix)
+  if [ -w "$NPM_PREFIX/lib/node_modules" ]; then
     npm install -g --no-progress @research/genie > /dev/null
   else
     out_line
     sudo npm install -g --no-progress @research/genie > /dev/null
+    sudo chmod 0775 "$NPM_PREFIX/bin/genie"
   fi
 
   if [ "$?" -eq 0 ]; then
