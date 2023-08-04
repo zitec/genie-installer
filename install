@@ -97,7 +97,7 @@ check_requirements() {
     local NODE_VERSION_INSTALLED="${NODE_VERSION_OUT:1:2}"
     local NODE_VERSION_REQUIRED=18
 
-    if [ "$NODE_VERSION_INSTALLED" -gt "$NODE_VERSION_REQUIRED" ]; then
+    if [ "$NODE_VERSION_INSTALLED" -ge "$NODE_VERSION_REQUIRED" ]; then
       IS_NODE_INSTALLED=true
     else
       HAS_REQUIREMENTS=false
