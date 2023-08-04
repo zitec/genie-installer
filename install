@@ -86,17 +86,16 @@ check_requirements() {
   out_line
 
   local HAS_REQUIREMENTS=true
+  local IS_NODE_INSTALLED=false
+  local NODE_VERSION_REQUIRED=18
 
   # Check if Node is installed
-  local IS_NODE_INSTALLED=false
   which node &> /dev/null
   if [ "$?" -eq 0 ]; then
 
     # Check if Node has minimum version
     local NODE_VERSION_OUT="$(node --version)"
     local NODE_VERSION_INSTALLED="${NODE_VERSION_OUT:1:2}"
-    local NODE_VERSION_REQUIRED=18
-
     if [ "$NODE_VERSION_INSTALLED" -ge "$NODE_VERSION_REQUIRED" ]; then
       IS_NODE_INSTALLED=true
     else
@@ -167,9 +166,12 @@ install_packages () {
 
   npm install -g --no-progress @research/genie > /dev/null
 
-  out_line
-  out_line "${GREEN}Genie installed successfully!${NC}"
-  out_line
+  if [ "$?" -eq 0 ]; then
+    out_line
+    out_line "${GREEN}Genie installed successfully!${NC}"
+    out_line
+  fi
+  
 }
 
 # Function that starts the script
