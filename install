@@ -68,7 +68,7 @@ display_welcome () {
   out_step "Ginie Installer" "1 / 4"
   out_line
   out_line "This wizard is going to help you setup Ginie on your system."
-  out_line "It will ask for your permission before performing any local changes."
+  out_line "It will ask for your confirmation before performing any local changes."
   out_line
 
   confirm_continue "Would you like to continue?"
