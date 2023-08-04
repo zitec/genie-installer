@@ -165,7 +165,6 @@ install_packages () {
   confirm_continue "Would you like to continue?"
 
   npm install -g --no-progress @research/genie > /dev/null
-
   if [ "$?" -eq 0 ]; then
     out_line
     out_line "${GREEN}Genie installed successfully!${NC}"
