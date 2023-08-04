@@ -170,7 +170,6 @@ install_packages () {
     out_line "${GREEN}Genie installed successfully!${NC}"
     out_line
   fi
-  
 }
 
 # Function that starts the script
