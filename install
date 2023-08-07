@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# Verify operating system is supported
+UNAMEOUT="$(uname -s)"
+case "${UNAMEOUT}" in
+    Linux*)             MACHINE=linux;;
+    Darwin*)            MACHINE=mac;;
+    *)                  MACHINE="UNKNOWN"
+esac
+
 # Determine if stdout is a terminal
 if test -t 1; then
 
@@ -110,8 +118,25 @@ check_requirements() {
   out_line
 
   if [ "$HAS_REQUIREMENTS" = false ]; then
+
     out_err "Some of the requirements are missing."
     out_line
+
+    if [ "$IS_NODE_INSTALLED" = false ]; then
+
+      out_line "It looks like you either don't have Node.js installed or you are using an older version."
+      out_line "Please install or update Node.js following the guide below and then try again."
+
+      if [ "$MACHINE" = 'linux' ]; then
+        out_line "› ${GREY}https://github.com/nodesource/distributions#installation-instructions${NC}"
+      elif [ "$MACHINE" = 'mac' ]; then 
+        out_line "› ${GREY}https://brew.sh${NC}"
+        out_line "› ${GREY}https://formulae.brew.sh/formula/node${NC}"
+      fi
+
+      out_line
+    fi
+
     exit 1
   fi
 
@@ -131,7 +156,7 @@ setup_token () {
   out_line "Generate a new token with ${CYAN}read_api${NC} scope and paste it down below."
   out_line
   out_line "This link will take you directly to Gitlab's Access Token page:"
-  out_line "${GREY}https://gitlab.zitec.com/-/profile/personal_access_tokens${NC}"
+  out_line "› ${GREY}https://gitlab.zitec.com/-/profile/personal_access_tokens${NC}"
   out_line
 
   local GITLAB_TOKEN=$(read_input "Token:")
@@ -157,9 +182,9 @@ install_packages () {
   out_step "Install Packages" "4 / 4"
   out_line
 
-  out_line "Installing the following Node.js packages:"
+  out_line "Installing Node.js packages:"
   out_line
-  out_line "${GREY}- @research/genie${NC}"
+  out_line "› ${GREY}@research/genie${NC}"
 
   out_line
   confirm_continue "Would you like to continue?"
