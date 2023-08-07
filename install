@@ -95,7 +95,7 @@ check_requirements() {
 
   local HAS_REQUIREMENTS=true
   local IS_NODE_INSTALLED=false
-  local NODE_VERSION_REQUIRED=18
+  local NODE_VERSION_REQUIRED=16
 
   # Check if Node is installed
   which node &> /dev/null
@@ -114,7 +114,7 @@ check_requirements() {
     HAS_REQUIREMENTS=false
   fi
   
-  out_req "Node.js (>= v18)" "$IS_NODE_INSTALLED"
+  out_req "Node.js (>= v$NODE_VERSION_REQUIRED)" "$IS_NODE_INSTALLED"
   out_line
 
   if [ "$HAS_REQUIREMENTS" = false ]; then
