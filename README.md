@@ -1,6 +1,6 @@
 # Genie
 
-Wizard for helping you setup [Genie](https://gitlab.zitec.com/research/genie) on your system.
+Shell script that makes installing [Genie](https://gitlab.zitec.com/research/genie) a breeze.
 
 ## Install
 
