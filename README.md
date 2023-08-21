@@ -1,4 +1,4 @@
-# Genie
+# Genie Installer
 
 Shell script that makes installing [Genie](https://gitlab.zitec.com/research/genie) a breeze.
 
