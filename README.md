@@ -10,6 +10,7 @@ bash <(curl -fsSL https://zit.ec/genie)
 
 ## Requirements
 
+- MacOS, Linux, Windows (WSL2)
 - Node.js (>= v18)
 
 ## FAQ
