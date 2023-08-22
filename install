@@ -94,6 +94,7 @@ check_requirements() {
   out_line
 
   local HAS_REQUIREMENTS=true
+  local IS_GENIE_ALREADY_INSTALLED=false
   local IS_NODE_INSTALLED=false
   local NODE_VERSION_REQUIRED=16
 
@@ -113,13 +114,28 @@ check_requirements() {
   else
     HAS_REQUIREMENTS=false
   fi
+
+  # Check if Genie is already installed
+  which genie &> /dev/null
+  if [ "$?" -eq 0 ]; then
+    IS_GENIE_ALREADY_INSTALLED=true
+    HAS_REQUIREMENTS=false
+  fi
   
   out_req "Node.js (>= v$NODE_VERSION_REQUIRED)" "$IS_NODE_INSTALLED"
   out_line
 
   if [ "$HAS_REQUIREMENTS" = false ]; then
 
-    out_err "Some of the requirements are missing."
+
+
+    if [ "$IS_GENIE_ALREADY_INSTALLED" = true ]; then
+
+      out_err "It looks like you already have ${CYAN}genie${NC} installed. If you wish to update it to the latest version please run ${CYAN}genie update${NC}."
+    else
+
+      out_err "Some of the requirements are missing."
+    fi
     out_line
 
     if [ "$IS_NODE_INSTALLED" = false ]; then
