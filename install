@@ -158,7 +158,7 @@ check_requirements() {
   # Check if we need to elevate privileges
   local NPM_PREFIX=$(npm config get prefix)
   if [ ! -w "$NPM_PREFIX" ]; then
-    out_line "Wizard requires root password in order to continue."
+    out_line "Wizard requires root password to continue."
     out_line
     sudo date > /dev/null
   fi
