@@ -158,9 +158,16 @@ check_requirements() {
   # Check if we need to elevate privileges
   local NPM_PREFIX=$(npm config get prefix)
   if [ ! -w "$NPM_PREFIX" ]; then
+
     out_line "Wizard requires root password to continue."
     out_line
+
     sudo date > /dev/null
+
+    IS_ROOT_USER=true
+
+  else
+    IS_ROOT_USER=false
   fi
 
   out_line "Your system meets all the necessary requirements."
@@ -194,8 +201,7 @@ setup_token () {
   confirm_continue "Would you like to continue?"
 
   # Check if we need root
-  local NPM_PREFIX=$(npm config get prefix)
-  if [ -w "$NPM_PREFIX" ]; then
+  if [ "$IS_ROOT_USER" = false ]; then
     npm config set -- //gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
     npm config set @research:registry https://gitlab.zitec.com/api/v4/packages/npm/
   else
@@ -220,8 +226,7 @@ install_packages () {
   confirm_continue "Would you like to continue?"
 
   # Check if we need root
-  local NPM_PREFIX=$(npm config get prefix)
-  if [ -w "$NPM_PREFIX" ]; then
+  if [ "$IS_ROOT_USER" = false ]; then
     npm install -g --no-progress @research/genie > /dev/null
   else
     sudo npm install -g --no-progress @research/genie > /dev/null && \
