@@ -185,8 +185,15 @@ setup_token () {
   out_line
   confirm_continue "Would you like to continue?"
 
-  npm config set -- //gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
-  npm config set @research:registry https://gitlab.zitec.com/api/v4/packages/npm/
+  # Check if we need to elevate privileges
+  local NPM_PREFIX=$(npm config get prefix)
+  if [ -w "$NPM_PREFIX" ]; then
+    npm config set -- //gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
+    npm config set @research:registry https://gitlab.zitec.com/api/v4/packages/npm/
+  else
+    sudo npm config set -- //gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
+    sudo npm config set @research:registry https://gitlab.zitec.com/api/v4/packages/npm/
+  fi
 }
 
 # Function that installs Node.js packages
