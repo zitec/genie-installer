@@ -115,12 +115,12 @@ check_requirements() {
     HAS_REQUIREMENTS=false
   fi
 
-  # # Check if Genie is already installed
-  # which genie &> /dev/null
-  # if [ "$?" -eq 0 ]; then
-  #   IS_GENIE_INSTALLED=true
-  #   HAS_REQUIREMENTS=false
-  # fi
+  # Check if Genie is already installed
+  which genie &> /dev/null
+  if [ "$?" -eq 0 ]; then
+    IS_GENIE_INSTALLED=true
+    HAS_REQUIREMENTS=false
+  fi
   
   out_req "Node.js (>= v$NODE_VERSION_REQUIRED)" "$IS_NODE_INSTALLED"
   out_line
