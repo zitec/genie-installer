@@ -115,12 +115,12 @@ check_requirements() {
     HAS_REQUIREMENTS=false
   fi
 
-  # Check if Genie is already installed
-  which genie &> /dev/null
-  if [ "$?" -eq 0 ]; then
-    IS_GENIE_INSTALLED=true
-    HAS_REQUIREMENTS=false
-  fi
+  # # Check if Genie is already installed
+  # which genie &> /dev/null
+  # if [ "$?" -eq 0 ]; then
+  #   IS_GENIE_INSTALLED=true
+  #   HAS_REQUIREMENTS=false
+  # fi
   
   out_req "Node.js (>= v$NODE_VERSION_REQUIRED)" "$IS_NODE_INSTALLED"
   out_line
@@ -155,6 +155,14 @@ check_requirements() {
     exit 1
   fi
 
+  # Check if we need to elevate privileges
+  local NPM_PREFIX=$(npm config get prefix)
+  if [ ! -w "$NPM_PREFIX" ]; then
+    out_line "Wizard requires root password in order to continue."
+    out_line
+    sudo date > /dev/null
+  fi
+
   out_line "Your system meets all the necessary requirements."
   out_line
   confirm_continue "Would you like to continue?"
@@ -185,7 +193,7 @@ setup_token () {
   out_line
   confirm_continue "Would you like to continue?"
 
-  # Check if we need to elevate privileges
+  # Check if we need root
   local NPM_PREFIX=$(npm config get prefix)
   if [ -w "$NPM_PREFIX" ]; then
     npm config set -- //gitlab.zitec.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
@@ -211,7 +219,7 @@ install_packages () {
   out_line
   confirm_continue "Would you like to continue?"
 
-  # Check if we need to elevate privileges
+  # Check if we need root
   local NPM_PREFIX=$(npm config get prefix)
   if [ -w "$NPM_PREFIX" ]; then
     npm install -g --no-progress @research/genie > /dev/null
