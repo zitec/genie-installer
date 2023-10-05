@@ -230,7 +230,7 @@ install_packages () {
     npm install -g --no-progress @research/genie > /dev/null
   else
     sudo npm install -g --no-progress @research/genie > /dev/null && \
-    sudo chmod 0755 "$NPM_PREFIX/bin/genie"
+    sudo chmod 0755 "$(npm config get prefix)/bin/genie"
   fi
 
   if [ "$?" -eq 0 ]; then
