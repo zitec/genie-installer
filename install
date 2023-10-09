@@ -156,7 +156,7 @@ check_requirements() {
   fi
 
   # Check if we need to elevate privileges
-  local NPM_PREFIX=$(npm config get prefix)
+  NPM_PREFIX=$(npm config get prefix)
   if [ ! -w "$NPM_PREFIX" ]; then
 
     out_line "Wizard requires root password to continue."
@@ -230,7 +230,7 @@ install_packages () {
     npm install -g --no-progress @research/genie > /dev/null
   else
     sudo npm install -g --no-progress @research/genie > /dev/null && \
-    sudo chmod 0755 "$(npm config get prefix)/bin/genie"
+    sudo chmod 0755 "$NPM_PREFIX/bin/genie"
   fi
 
   if [ "$?" -eq 0 ]; then
